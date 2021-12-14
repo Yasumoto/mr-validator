@@ -1,0 +1,30 @@
+#!/bin/sh
+
+set -e
+
+# This is the recommended installation method
+# https://docs.bazel.build/versions/4.2.2/install-bazelisk.html
+BAZELISK_VERSION="1.11.0"
+
+HARDWARE="$(uname -m)"
+if [ "$HARDWARE" = "x86_64" ]; then
+    HARDWARE="amd64"
+fi
+
+if [ -f /etc/lsb-release ]; then
+    OS="linux"
+else
+    OS="darwin"
+fi
+
+DOWNLOAD_URL="https://github.com/bazelbuild/bazelisk/releases/download/v${BAZELISK_VERSION}/bazelisk-${OS}-${HARDWARE}"
+
+# Use Bazelisk's caching directory
+# https://github.com/bazelbuild/bazelisk#where-does-bazelisk-store-the-downloaded-versions-of-bazel
+if [ ! -x "${HOME}/.cache/bazelisk/bazelisk" ]; then
+    mkdir -p "${HOME}/.cache/bazelisk"
+    curl -L -o "${HOME}/.cache/bazelisk/bazelisk" "${DOWNLOAD_URL}"
+    chmod +x "${HOME}/.cache/bazelisk/bazelisk"
+fi
+
+"${HOME}/.cache/bazelisk/bazelisk" "$@"
